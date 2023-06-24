@@ -2,7 +2,7 @@
 A program which is an assembler to to take an assembly-language program and produce the corresponding machine language.
 (instruction set and instruction format of the LC-2K. Not MIPS!!)
 
-## ASSEMBLER
+## [ASSEMBLER]
 take an assembly-language program and translate it into machine language.
 ### assembler.c
 Main file that converts .as file to .mc file.
@@ -24,7 +24,7 @@ assemble program.as program.mc
 ```
 The first argument is the file name where the assembly-language program is stored, and the second argument is the file name where the output (the machine-code) is written.
 
-## MULTIPLIER
+## [MULTIPLIER]
 An assembly-language program to multiply two numbers.   
 Input the numbers by reading memory locations called mcand and mplier.   
 The result stored in register 1.   
