@@ -18,6 +18,12 @@ Example of assembler output
 Test cases to validate any LC-2K assembler.   
 5 normal case, 5 error case
 
+## To run it
+```
+assemble program.as program.mc
+```
+The first argument is the file name where the assembly-language program is stored, and the second argument is the file name where the output (the machine-code) is written.
+
 ## MULTIPLIER
 An assembly-language program to multiply two numbers.   
 Input the numbers by reading memory locations called mcand and mplier.   
