@@ -1,0 +1,59 @@
+reg1: 0         [store result]        
+reg2: mcand     [<<]             111 1111 1111 1110
+reg3: mplier    [no shift]        11 0000 0010 1000
+reg4: mask 1    [<<]            0000 0000 0000 0001
+
+reg5: use to calculate
+reg6: 16        [count loop --]     
+reg7: -1
+reg0: zero XX reg4 needs to be leftshift. but used to calculate too. 
+      -> use to calculate nor mask
+
+(reg2: mcand(<<) / reg3: mplier / reg4: 1(<<)) -> fixed or just shift
+(reg1: result / reg5: cal use) -> change
+
+                    <BEQ>   mcand = 0                           -> stop
+                    <NOOP>                                      -> check last bit in mplier and add mcand or not
+loop    loop:       <BEQ>   (1X)mplier = 0 or (2)just 16 times? -> break (mplier noshift -> select (2)16times)
+                            reg6 = zero
+                    <NOR>   reg5 = ~(mplier | 0 or mplier)        11 0000 0010 1000 ->   00 1111 1101 0111
+                    <NOR>   reg4 = ~(reg4 | 0 or reg4)          0000 0000 0000 0001 -> 1111 1111 1111 1110
+                    <NOR>   reg5 = ~(reg5 | -2(X)->reg4)                 0 if last bit of mcand is 0, 1 if 1
+                    <BEQ>   if zero = reg5                      -> noadd
+                    <ADD>   result = result + mcand
+                    <NOOP>                                      -> update mcand << 1, mplier >> 1
+        noadd:      <ADD>   mcand = mcand + mcand               = mcand x 2 = mcand << 1
+                    <ADD>   reg4 = reg4 + reg4                  = reg4 x 2 = reg4 << 1
+                    <ADD>   reg6 = reg6 + reg7                  == reg6 -= 1
+                    <BEQ>   always to loop
+                    <HALT>
+
+        
+        lw      0       1       zero        load reg1(result) with zero 0
+        lw      0       2       mcand       load reg2 with mcand 32766
+        lw      0       3       mplier      load reg3 with mplier 12328
+        lw      0       4       mask        load reg4(for nor) with last -2 (1111 1110)
+        lw      0       5       zero        load reg5 with zero 0
+        lw      0       6       16
+        lw      0       7       -1
+        lw      0       0       zero
+        beq     2       5       done        stop when mcand = 0 (doesn't change so before loop)
+        beq     3       5       done        stop when mplier = 0
+loop    beq     6       0       done
+        nor     3       0       5           reg5 = ~(mplier | 0)
+        nor     4       0       4           reg4 = ~(reg4 | 0)
+        nor     5       4       5           reg5 = ~(reg5 | reg4)
+        beq     0       5       noadd       if zero = reg5  -> noadd
+        add     1       2       1           reg1(result) = reg1 + reg2(shifted mcand)
+        noop                                update registers(2:mcand << 1, 4: mask << 1, 6:loop_count --)
+noadd   add     2       2       2           mcand = mcand + mcand == mcand x 2 == mcand << 1
+        add     4       4       4           reg4 = reg4 + reg4 == reg4 x 2 == reg4 << 1
+        add     6       7       6           reg6 = reg6 + reg7 == reg6 -= 1
+        beq     0       0       loop
+done    halt                         
+        noop
+mcand    .fill   32766
+mplier    .fill   12328
+mask    .fill   1
+none    .fill   -1
+zero    .fill     0
